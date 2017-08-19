@@ -17,7 +17,7 @@ public class TerrainCell : MonoBehaviour {
         meshRenderer = GetComponent<MeshRenderer>();
         meshFilter = GetComponent<MeshFilter>();
         thisTransform = GetComponent<Transform>();
-        mesh = GetPlain(Vector3.zero, Vector3.right, Vector3.forward, Size);
+        mesh = CreatePlain(Vector3.zero, Vector3.right, Vector3.forward, Size);
         meshFilter.mesh = mesh;
     }
 	
@@ -76,7 +76,7 @@ public class TerrainCell : MonoBehaviour {
         return plain;
     }
 
-    public Mesh GetPlain(Vector3 origin, Vector3 width, 
+    public Mesh CreatePlain(Vector3 origin, Vector3 width, 
         Vector3 length, int size)
     {
         var combine = new CombineInstance[size * size];
@@ -89,22 +89,22 @@ public class TerrainCell : MonoBehaviour {
             }
         }
 
-        var mesh = new Mesh();
-        mesh.CombineMeshes(combine, true, false);
+        var plain = new Mesh();
+        plain.CombineMeshes(combine, true, false);
 
-        return mesh;
+        return plain;
     }
 
     public Mesh Quad(Vector3 origin, Vector3 width, Vector3 length) {
         var normal = Vector3.Cross(length, width).normalized;
-        var mesh = new Mesh {
+        var quad = new Mesh {
             vertices = new[] { origin, origin + length, origin + length + width, origin + width },
             normals = new[] { normal, normal, normal, normal },
             uv = new[] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0) },
             triangles = new[] { 0, 1, 2, 0, 2, 3 }
         };
 
-        return mesh;
+        return quad;
     }
 
     public void DebugMesh(Mesh mesh) {
