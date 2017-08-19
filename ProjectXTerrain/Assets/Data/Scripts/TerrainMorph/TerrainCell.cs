@@ -17,7 +17,7 @@ public class TerrainCell : MonoBehaviour {
         meshRenderer = GetComponent<MeshRenderer>();
         meshFilter = GetComponent<MeshFilter>();
         thisTransform = GetComponent<Transform>();
-        mesh = CreatePlain(Vector3.zero, Vector3.right, Vector3.forward, Size);
+        mesh = GetPlain01(Size);
         meshFilter.mesh = mesh;
     }
 	
@@ -33,25 +33,27 @@ public class TerrainCell : MonoBehaviour {
     public Mesh GetPlain01(int size) {
         var plain = new Mesh();
 
-        var countPointTriangleOne = (size - 1) * 6;
-        var countPointTriangle = (int)Mathf.Pow(size - 1, 2) * 6;
+        var verticesCount = size * size;
+        var pointTriangleOneCount = (size - 1) * 6;
+        var pointTriangleCount = (int)Mathf.Pow(size - 1, 2) * 6;
 
         var vertices = new List<Vector3>();
-        var triangles = new int[countPointTriangle];
+        var triangles = new int[pointTriangleCount];
         var normals = new List<Vector3>();
         var colors = new List<Color>();
+        var uvs = new List<Vector2>();
 
         for (var i = 0; i < size; i++) {
             for (var j = 0; j < size; j++) {
                 vertices.Add(new Vector3(i, 0, j));
-                normals.Add(new Vector3(i, Vector3.up.y, j));
+                normals.Add(Vector3.Cross(Vector3.forward, Vector3.right).normalized);
                 colors.Add(Color.white);
             }
         }
 
         for (var i = 0; i < size - 1; i++) {
             for (var j = 0; j < size - 1; j++) {
-                var ind = i * countPointTriangleOne + j * 6;
+                var ind = i * pointTriangleOneCount + j * 6;
                 triangles[ind] = GetIndexByCoord(vertices, 
                     new Vector3(i, 0, j));
                 triangles[ind + 1] = GetIndexByCoord(vertices,
@@ -67,39 +69,61 @@ public class TerrainCell : MonoBehaviour {
             }
         }
 
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+                var uv = new Vector2(
+                    i / (float)size, 
+                    j / (float)size);
+
+                uvs.Add(uv);
+            }
+        }
+
         plain.name = "plain";
         plain.SetVertices(vertices);
         plain.SetColors(colors);
         plain.SetNormals(normals);
         plain.SetTriangles(triangles, 0);
+        plain.SetUVs(0, uvs);
 
         return plain;
     }
 
-    public Mesh CreatePlain(Vector3 origin, Vector3 width, 
+    public Mesh CreateCell(Vector3 origin, Vector3 width, 
         Vector3 length, int size) {
-        var combine = new CombineInstance[size * size];
+        var cell = new Mesh();
+        var count = size * size;
+        var combine = new CombineInstance[count];
 
-        var i = 0;
+        var k = 0;
         for (var x = 0; x < size; x++) {
             for (var y = 0; y < size; y++) {
-                combine[i].mesh = CreateQuad(origin + width * x + length * y, width, length);
-                i++;
+                combine[k].mesh = CreateQuad(origin + width * x + length * y, width, length, size);
+                k++;
             }
         }
 
-        var plain = new Mesh();
-        plain.CombineMeshes(combine, true, false);
+        var uv = new Vector2[size * size];
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+                uv[i * size + j] = new Vector2(i / (float)count,
+                    j / (float)count);
+            }
+        }
 
-        return plain;
+        cell.name = "Cell";
+        cell.CombineMeshes(combine, true, false);
+        cell.uv = uv;
+
+        return cell;
     }
 
-    public Mesh CreateQuad(Vector3 origin, Vector3 width, Vector3 length) {
+    public Mesh CreateQuad(Vector3 origin, Vector3 width, Vector3 length, int size) {
         var normal = Vector3.Cross(length, width).normalized;
         var quad = new Mesh {
             vertices = new[] { origin, origin + length, origin + length + width, origin + width },
             normals = new[] { normal, normal, normal, normal },
-            uv = new[] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0) },
+            uv = new[] { new Vector2(0, 0), new Vector2(0, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0) },
             triangles = new[] { 0, 1, 2, 0, 2, 3 }
         };
 
