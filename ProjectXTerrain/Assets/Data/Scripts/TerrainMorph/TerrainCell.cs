@@ -6,7 +6,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class TerrainCell : MonoBehaviour {
-    public int Size = 2;
+    [Range(0.01f, 1f)]
+    public float QuadSize = 0.5f;
+    [Range(2, 500)]
+    public int QuadCount = 4;
 
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
@@ -17,7 +20,7 @@ public class TerrainCell : MonoBehaviour {
         meshRenderer = GetComponent<MeshRenderer>();
         meshFilter = GetComponent<MeshFilter>();
         thisTransform = GetComponent<Transform>();
-        mesh = GetPlain01(Size);
+        mesh = CreateCell(QuadCount);
         meshFilter.mesh = mesh;
     }
 	
@@ -30,63 +33,69 @@ public class TerrainCell : MonoBehaviour {
         }*/
     }
 
-    public Mesh GetPlain01(int size) {
-        var plain = new Mesh();
-
-        var verticesCount = size * size;
-        var pointTriangleOneCount = (size - 1) * 6;
-        var pointTriangleCount = (int)Mathf.Pow(size - 1, 2) * 6;
-
+    public Mesh CreateCell(int size) {
+        var result = new Mesh();
         var vertices = new List<Vector3>();
-        var triangles = new int[pointTriangleCount];
         var normals = new List<Vector3>();
         var colors = new List<Color>();
-        var uvs = new List<Vector2>();
 
         for (var i = 0; i < size; i++) {
             for (var j = 0; j < size; j++) {
-                vertices.Add(new Vector3(i, 0, j));
+                vertices.Add(new Vector3(i * QuadSize, 0, j * QuadSize));
                 normals.Add(Vector3.Cross(Vector3.forward, Vector3.right).normalized);
                 colors.Add(Color.white);
             }
         }
 
+        result.name = "plain";
+        result.SetVertices(vertices);
+        result.SetColors(colors);
+        result.SetNormals(normals);
+        result.SetTriangles(GetTriangles(vertices, size), 0);
+        result.SetUVs(0, GetUvs(size));
+
+        return result;
+    }
+
+    public int[] GetTriangles(IList<Vector3> vertices, int size) {
+        var pointTriangleCount = (int)Mathf.Pow(size - 1, 2) * 6;
+        var pointTriangleOneCount = (size - 1) * 6;
+        var triangles = new int[pointTriangleCount];
+
         for (var i = 0; i < size - 1; i++) {
             for (var j = 0; j < size - 1; j++) {
                 var ind = i * pointTriangleOneCount + j * 6;
-                triangles[ind] = GetIndexByCoord(vertices, 
-                    new Vector3(i, 0, j));
+                triangles[ind] = GetIndexByCoord(vertices,
+                    new Vector3(i * QuadSize, 0, j * QuadSize));
                 triangles[ind + 1] = GetIndexByCoord(vertices,
-                    new Vector3(i, 0, j + 1));
+                    new Vector3(i * QuadSize, 0, (j + 1) * QuadSize));
                 triangles[ind + 2] = GetIndexByCoord(vertices,
-                    new Vector3(i + 1, 0, j));
+                    new Vector3((i + 1) * QuadSize, 0, j * QuadSize));
                 triangles[ind + 3] = GetIndexByCoord(vertices,
-                    new Vector3(i, 0, j + 1));
+                    new Vector3(i * QuadSize, 0, (j + 1) * QuadSize));
                 triangles[ind + 4] = GetIndexByCoord(vertices,
-                    new Vector3(i + 1, 0, j + 1));
+                    new Vector3((i + 1) * QuadSize, 0, (j + 1) * QuadSize));
                 triangles[ind + 5] = GetIndexByCoord(vertices,
-                    new Vector3(i + 1, 0, j));
+                    new Vector3((i + 1) * QuadSize, 0, j * QuadSize));
             }
         }
 
+        return triangles;
+    }
+
+    public List<Vector2> GetUvs(int size) {
+        var result = new List<Vector2>();
         for (var i = 0; i < size; i++) {
             for (var j = 0; j < size; j++) {
                 var uv = new Vector2(
-                    i / (float)size, 
+                    i / (float)size,
                     j / (float)size);
 
-                uvs.Add(uv);
+                result.Add(uv);
             }
         }
 
-        plain.name = "plain";
-        plain.SetVertices(vertices);
-        plain.SetColors(colors);
-        plain.SetNormals(normals);
-        plain.SetTriangles(triangles, 0);
-        plain.SetUVs(0, uvs);
-
-        return plain;
+        return result;
     }
 
     public Mesh CreateCell(Vector3 origin, Vector3 width, 
@@ -146,7 +155,6 @@ public class TerrainCell : MonoBehaviour {
                     thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i]]));
             }
             
-
             Gizmos.color = defaultColor;
         }
     }
