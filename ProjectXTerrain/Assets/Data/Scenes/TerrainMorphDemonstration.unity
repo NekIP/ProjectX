@@ -141,6 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fedf5e34c98dd52478e81c3f1c04f94f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Name: TerrainMorphCell
   QuadSize: 0.25
   VerticesCount: 80
 --- !u!23 &37586238
@@ -417,7 +418,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 225943f887e687b4ba44825acebf4a79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CellCountInOneSideDefault: 3
   Cells: []
+  QuadSize: 0.25
+  VerticesCount: 80
 --- !u!4 &1042298387
 Transform:
   m_ObjectHideFlags: 0
