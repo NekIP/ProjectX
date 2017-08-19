@@ -16,29 +16,36 @@ public class TerrainCell : MonoBehaviour {
     }
 	
 	void Update () {
-		
 	}
+
+    void OnDrawGizmos() {
+        if (meshFilter != null && meshFilter.mesh != null) {
+            DebugMesh(meshFilter.mesh);
+        }
+    }
 
     public Mesh GetPlain(int size) {
         var plain = new Mesh();
-        var countTriangle = (int)Mathf.Pow(size - 1, 2) * 6;
+
+        var countPointTriangleOne = (size - 1) * 6;
+        var countPointTriangle = (int)Mathf.Pow(size - 1, 2) * 6;
 
         var vertices = new List<Vector3>();
-        var triangles = new int[countTriangle];
+        var triangles = new int[countPointTriangle];
         var normals = new List<Vector3>();
         var colors = new List<Color>();
 
-        for (var i = 0; i < Size; i++) {
-            for (var j = 0; j < Size; j++) {
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
                 vertices.Add(new Vector3(i, 0, j));
                 normals.Add(new Vector3(i, Vector3.up.y, j));
                 colors.Add(Color.white);
             }
         }
 
-        for (var i = 0; i < Size - 1; i++) {
-            for (var j = 0; j < Size - 1; j++) {
-                var ind = 6 * (i * Size + j);
+        for (var i = 0; i < size - 1; i++) {
+            for (var j = 0; j < size - 1; j++) {
+                var ind = i * countPointTriangleOne + j * 6;
                 triangles[ind] = GetIndexByCoord(vertices, 
                     new Vector3(i, 0, j));
                 triangles[ind + 1] = GetIndexByCoord(vertices,
@@ -61,6 +68,34 @@ public class TerrainCell : MonoBehaviour {
         plain.SetTriangles(triangles, 0);
 
         return plain;
+    }
+
+    public void DebugMesh(Mesh mesh) {
+        if (mesh.vertices != null && mesh.vertices.Length > 0) {
+            var defaultColor = Gizmos.color;
+            Gizmos.color = Color.green;
+            foreach (var vertice in mesh.vertices) {
+                Gizmos.DrawSphere(vertice, 0.1f);
+            }
+
+            Gizmos.color = defaultColor;
+        }
+
+        if (mesh.triangles != null && mesh.triangles.Length > 0) {
+            var defaultColor = Gizmos.color;
+            Gizmos.color = Color.green;
+            for (var i = 0; i < mesh.triangles.Length; i += 3) {
+                Gizmos.DrawLine(mesh.vertices[mesh.triangles[i]], 
+                    mesh.vertices[mesh.triangles[i + 1]]);
+                Gizmos.DrawLine(mesh.vertices[mesh.triangles[i + 1]],
+                    mesh.vertices[mesh.triangles[i + 2]]);
+                Gizmos.DrawLine(mesh.vertices[mesh.triangles[i + 2]], 
+                    mesh.vertices[mesh.triangles[i]]);
+            }
+            
+
+            Gizmos.color = defaultColor;
+        }
     }
 
     private int GetIndexByCoord(IList<Vector3> items, Vector3 searchItem) {
