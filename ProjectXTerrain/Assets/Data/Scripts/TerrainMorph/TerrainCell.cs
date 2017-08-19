@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter))]
 public class TerrainCell : MonoBehaviour {
     public int Size = 2;
 
-    Mesh mesh;
+    MeshRenderer meshRenderer;
     MeshFilter meshFilter;
+    Mesh mesh;
+    Transform thisTransform;
 
     void Start () {
-        meshFilter = gameObject.AddComponent<MeshFilter>();
-        mesh = GetPlain(Size);
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshFilter = GetComponent<MeshFilter>();
+        thisTransform = GetComponent<Transform>();
+        mesh = GetPlain(Vector3.zero, Vector3.right, Vector3.forward, Size);
         meshFilter.mesh = mesh;
     }
 	
@@ -19,12 +25,12 @@ public class TerrainCell : MonoBehaviour {
 	}
 
     void OnDrawGizmos() {
-        if (meshFilter != null && meshFilter.mesh != null) {
+        /*if (meshFilter != null && meshFilter.mesh != null) {
             DebugMesh(meshFilter.mesh);
-        }
+        }*/
     }
 
-    public Mesh GetPlain(int size) {
+    public Mesh GetPlain01(int size) {
         var plain = new Mesh();
 
         var countPointTriangleOne = (size - 1) * 6;
@@ -70,27 +76,51 @@ public class TerrainCell : MonoBehaviour {
         return plain;
     }
 
-    public void DebugMesh(Mesh mesh) {
-        if (mesh.vertices != null && mesh.vertices.Length > 0) {
-            var defaultColor = Gizmos.color;
-            Gizmos.color = Color.green;
-            foreach (var vertice in mesh.vertices) {
-                Gizmos.DrawSphere(vertice, 0.1f);
-            }
+    public Mesh GetPlain(Vector3 origin, Vector3 width, 
+        Vector3 length, int size)
+    {
+        var combine = new CombineInstance[size * size];
 
-            Gizmos.color = defaultColor;
+        var i = 0;
+        for (var x = 0; x < size; x++) {
+            for (var y = 0; y < size; y++) {
+                combine[i].mesh = Quad(origin + width * x + length * y, width, length);
+                i++;
+            }
         }
 
+        var mesh = new Mesh();
+        mesh.CombineMeshes(combine, true, false);
+
+        return mesh;
+    }
+
+    public Mesh Quad(Vector3 origin, Vector3 width, Vector3 length) {
+        var normal = Vector3.Cross(length, width).normalized;
+        var mesh = new Mesh {
+            vertices = new[] { origin, origin + length, origin + length + width, origin + width },
+            normals = new[] { normal, normal, normal, normal },
+            uv = new[] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0) },
+            triangles = new[] { 0, 1, 2, 0, 2, 3 }
+        };
+
+        return mesh;
+    }
+
+    public void DebugMesh(Mesh mesh) {
         if (mesh.triangles != null && mesh.triangles.Length > 0) {
             var defaultColor = Gizmos.color;
             Gizmos.color = Color.green;
             for (var i = 0; i < mesh.triangles.Length; i += 3) {
-                Gizmos.DrawLine(mesh.vertices[mesh.triangles[i]], 
-                    mesh.vertices[mesh.triangles[i + 1]]);
-                Gizmos.DrawLine(mesh.vertices[mesh.triangles[i + 1]],
-                    mesh.vertices[mesh.triangles[i + 2]]);
-                Gizmos.DrawLine(mesh.vertices[mesh.triangles[i + 2]], 
-                    mesh.vertices[mesh.triangles[i]]);
+                Gizmos.DrawLine(
+                    thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i]]),
+                    thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i + 1]]));
+                Gizmos.DrawLine(
+                    thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i + 1]]),
+                    thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i + 2]]));
+                Gizmos.DrawLine(
+                    thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i + 2]]),
+                    thisTransform.TransformPoint(mesh.vertices[mesh.triangles[i]]));
             }
             
 
