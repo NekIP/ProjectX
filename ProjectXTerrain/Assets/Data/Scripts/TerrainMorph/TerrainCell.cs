@@ -77,14 +77,13 @@ public class TerrainCell : MonoBehaviour {
     }
 
     public Mesh CreatePlain(Vector3 origin, Vector3 width, 
-        Vector3 length, int size)
-    {
+        Vector3 length, int size) {
         var combine = new CombineInstance[size * size];
 
         var i = 0;
         for (var x = 0; x < size; x++) {
             for (var y = 0; y < size; y++) {
-                combine[i].mesh = Quad(origin + width * x + length * y, width, length);
+                combine[i].mesh = CreateQuad(origin + width * x + length * y, width, length);
                 i++;
             }
         }
@@ -95,7 +94,7 @@ public class TerrainCell : MonoBehaviour {
         return plain;
     }
 
-    public Mesh Quad(Vector3 origin, Vector3 width, Vector3 length) {
+    public Mesh CreateQuad(Vector3 origin, Vector3 width, Vector3 length) {
         var normal = Vector3.Cross(length, width).normalized;
         var quad = new Mesh {
             vertices = new[] { origin, origin + length, origin + length + width, origin + width },
