@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -88,8 +89,8 @@ public class TerrainCell : MonoBehaviour {
         for (var i = 0; i < size; i++) {
             for (var j = 0; j < size; j++) {
                 var uv = new Vector2(
-                    i / (float)size,
-                    j / (float)size);
+                    (float)Math.Round(i / (float)(size - 1), 2),
+                    (float)Math.Round(j / (float)(size - 1), 2));
 
                 result.Add(uv);
             }
@@ -123,7 +124,7 @@ public class TerrainCell : MonoBehaviour {
         cell.name = "Cell";
         cell.CombineMeshes(combine, true, false);
         cell.uv = uv;
-
+        
         return cell;
     }
 
