@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TerrainMorph : MonoBehaviour {
+    public List<TerrainMorphCell> Cells = new List<TerrainMorphCell>();
 
-	// Use this for initialization
 	void Start () {
-		
-	}
+        
+    }
 	
-	// Update is called once per frame
 	void Update () {
 		
 	}
