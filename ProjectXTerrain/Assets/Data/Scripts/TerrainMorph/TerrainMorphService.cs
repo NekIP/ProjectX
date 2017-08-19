@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace TerrainMorphSpace
@@ -16,7 +14,8 @@ namespace TerrainMorphSpace
         ///     The size of the sides of the square formed by the 
         ///     vertices(or the distance between adjacent vertices without diagonal)
         /// </param>
-        public static Mesh CreateCellMesh(int verticesCount, float quadSize)
+        /// <param name="name">Common name for this mesh</param>
+        public static Mesh CreateCellMesh(string name, int verticesCount, float quadSize)
         {
             var result = new Mesh();
             var vertices = new List<Vector3>();
@@ -33,7 +32,7 @@ namespace TerrainMorphSpace
                 }
             }
 
-            result.name = "plain";
+            result.name = name + "Mesh";
             result.SetVertices(vertices);
             result.SetColors(colors);
             result.SetNormals(normals);
