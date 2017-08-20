@@ -13,6 +13,7 @@ namespace TerrainMorphSpace
         public int VerticesCount { get; set; }
         public Texture2D DefaultTexture { get; set; }
         public Shader DefaultShader { get; set; }
+        public TerrainMorphTransform Transform { get; set; }
         public List<TerrainMorphCellData> Cells { get; set; }
 
         public static TerrainMorphData Map(TerrainMorph item)
@@ -51,6 +52,7 @@ namespace TerrainMorphSpace
         public int VerticesCount { get; set; }
         public Texture2D DefaultTexture { get; set; }
         public Shader DefaultShader { get; set; }
+        public TerrainMorphTransform Transform { get; set; }
         public TerrainMorphCellMeshData Mesh { get; set; }
 
         public static TerrainMorphCellData Map(TerrainMorphCell item)
@@ -62,7 +64,8 @@ namespace TerrainMorphSpace
                 VerticesCount = item.VerticesCount,
                 DefaultTexture = item.DefaultTexture,
                 DefaultShader = item.DefaultShader,
-                Mesh = TerrainMorphCellMeshData.Map(item.Mesh)
+                Mesh = TerrainMorphCellMeshData.Map(item.Mesh),
+                Transform = TerrainMorphTransform.Map(item.transform)
             };
         }
 
@@ -70,12 +73,17 @@ namespace TerrainMorphSpace
         {
             var cellObj = new GameObject(item.Name, typeof(TerrainMorphCell));
             var cellComponent = cellObj.GetComponent<TerrainMorphCell>();
+
             cellComponent.Name = item.Name;
             cellComponent.QuadSize = item.QuadSize;
             cellComponent.VerticesCount = item.VerticesCount;
             cellComponent.DefaultTexture = item.DefaultTexture;
             cellComponent.DefaultShader = item.DefaultShader;
             cellComponent.Mesh = TerrainMorphCellMeshData.Map(item.Mesh);
+            cellComponent.transform.position = item.Transform.Position;
+            cellComponent.transform.rotation = item.Transform.Rotation;
+            cellComponent.transform.localScale = item.Transform.Scale;
+
             return cellComponent;
         }
     }
@@ -112,6 +120,23 @@ namespace TerrainMorphSpace
                 uv = item.Uvs,
                 colors = item.Colors,
                 triangles = item.Triangles
+            };
+        }
+    }
+
+    public class TerrainMorphTransform
+    {
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public Vector3 Scale { get; set; }
+
+        public static TerrainMorphTransform Map(Transform item)
+        {
+            return new TerrainMorphTransform
+            {
+                Position = item.position,
+                Rotation = item.rotation,
+                Scale = item.localScale
             };
         }
     }
