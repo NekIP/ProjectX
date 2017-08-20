@@ -21,6 +21,28 @@ public class TerrainMorphCell : MonoBehaviour
     public Texture2D DefaultTexture;
     public Shader DefaultShader;
 
+    public Mesh Mesh
+    {
+        get
+        {
+            if (!meshFilter)
+            {
+                meshFilter = GetComponent<MeshFilter>();
+            }
+
+            return meshFilter.mesh;
+        }
+        set
+        {
+            if (!meshFilter)
+            {
+                meshFilter = GetComponent<MeshFilter>();
+            }
+
+            meshFilter.mesh = value;
+        }
+    }
+
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
     private Transform thisTransform;
