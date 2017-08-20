@@ -3,6 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
+[ExecuteInEditMode]
 public class TerrainMorphCell : MonoBehaviour
 {
     public string Name = "TerrainMorphCell";
@@ -17,6 +18,9 @@ public class TerrainMorphCell : MonoBehaviour
         "(or the distance between adjacent vertices without diagonal)")]
     public int VerticesCount = 80;
 
+    public Texture2D DefaultTexture;
+    public Shader DefaultShader;
+
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
     private Transform thisTransform;
@@ -27,29 +31,34 @@ public class TerrainMorphCell : MonoBehaviour
     }
 
     public void Initialize(int id, Vector3 position, 
-        float quadSize = 0, int verticesCount = 0)
+        float quadSize, int verticesCount, 
+        Texture2D defaultTexture, Shader defaultShader)
     {
         var correctId = GetCorrectId(id);
 
         InitializeComponents();
+        
+        QuadSize = quadSize;
+        VerticesCount = verticesCount;
+        DefaultTexture = defaultTexture;
+        DefaultShader = defaultShader;
 
-        if (quadSize != 0)
-        {
-            QuadSize = quadSize;
-        }
-
-        if (verticesCount != 0)
-        {
-            VerticesCount = verticesCount;
-        }
-
-        meshFilter.mesh = TerrainMorphService.CreateCellMesh(
+        meshFilter.sharedMesh = TerrainMorphService.CreateCellMesh(
             Name + "Mesh" + correctId, 
             VerticesCount, 
             QuadSize);
 
         meshRenderer.materials = new Material[1];
-        meshRenderer.materials[0] = new Material(Shader.Find("Standard"));
+
+        if (DefaultShader != null)
+        {
+            meshRenderer.materials[0] = new Material(DefaultShader);
+            if (DefaultTexture != null)
+            {
+                meshRenderer.materials[0].SetTexture("_MainTex", DefaultTexture);
+            }
+        }
+
         thisTransform.position = position;
         Name = Name + correctId;
         name = Name;

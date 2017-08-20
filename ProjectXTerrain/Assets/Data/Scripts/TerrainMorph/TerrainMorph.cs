@@ -20,21 +20,23 @@ public class TerrainMorph : MonoBehaviour
         "(or the distance between adjacent vertices without diagonal)")]
     public int VerticesCount = 80;
 
+    public Texture2D DefaultTexture;
+    public Shader DefaultShader;
+
+    [HideInInspector]
+    public bool WasInitialized = false;
+
     Transform thisTransform;
 
 	void Start ()
     {
-        thisTransform = GetComponent<Transform>();
-        Initialize();
+        InitializeComponents();
     }
 	
-	void Update ()
-    {
-		
-	}
-
     public void Initialize()
     {
+        InitializeComponents();
+
         if (TryDownloadData())
         {
             return;
@@ -51,13 +53,17 @@ public class TerrainMorph : MonoBehaviour
                     Cells.Count,
                     thisTransform.position + new Vector3(i * cellSize, 0, j * cellSize),
                     QuadSize,
-                    VerticesCount);
+                    VerticesCount,
+                    DefaultTexture,
+                    DefaultShader);
 
                 Cells.Add(cellComponent);
 
                 cellObj.transform.parent = thisTransform;
             }
         }
+
+        WasInitialized = true;
     }
 
     public bool TryDownloadData()
@@ -68,5 +74,13 @@ public class TerrainMorph : MonoBehaviour
     public void SaveData()
     {
 
+    }
+
+    private void InitializeComponents()
+    {
+        if (!thisTransform)
+        {
+            thisTransform = GetComponent<Transform>();
+        }
     }
 }
