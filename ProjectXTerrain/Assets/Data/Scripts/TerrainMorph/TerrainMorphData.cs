@@ -6,54 +6,44 @@ using UnityEngine;
 
 namespace TerrainMorphSpace
 {
+    [Serializable]
     public class TerrainMorphData
     {
-        public string Name { get; set; }
-        public float QuadSize { get; set; }
-        public int VerticesCount { get; set; }
-        public Texture2D DefaultTexture { get; set; }
-        public Shader DefaultShader { get; set; }
-        public TerrainMorphTransform Transform { get; set; }
-        public List<TerrainMorphCellData> Cells { get; set; }
+        public string Name;
+        public float QuadSize;
+        public int VerticesCount;
+        public Texture2D DefaultTexture;
+        public Shader DefaultShader;
+        public TerrainMorphTransform Transform;
+        public int CellCountInOneSideDefault;
+        public List<TerrainMorphCellData> Cells;
 
         public static TerrainMorphData Map(TerrainMorph item)
         {
             return new TerrainMorphData
             {
-                Name = item.name,
+                Name = item.Name,
                 QuadSize = item.QuadSize,
                 VerticesCount = item.VerticesCount,
                 DefaultTexture = item.DefaultTexture,
                 DefaultShader = item.DefaultShader,
+                CellCountInOneSideDefault = item.CellCountInOneSideDefault,
+                Transform = TerrainMorphTransform.Map(item.transform),
                 Cells = item.Cells.Select(TerrainMorphCellData.Map).ToList()
             };
         }
-
-        public static TerrainMorph Map(TerrainMorphData item)
-        {
-            var terrainObj = new GameObject(item.Name, typeof(TerrainMorph));
-
-            var terrainComponent = terrainObj.GetComponent<TerrainMorph>();
-            terrainComponent.name = item.Name;
-            terrainComponent.QuadSize = item.QuadSize;
-            terrainComponent.VerticesCount = item.VerticesCount;
-            terrainComponent.DefaultTexture = item.DefaultTexture;
-            terrainComponent.DefaultShader = item.DefaultShader;
-            terrainComponent.Cells = item.Cells.Select(TerrainMorphCellData.Map).ToList();
-
-            return terrainComponent;
-        }
     }
 
+    [Serializable]
     public class TerrainMorphCellData
     {
-        public string Name { get; set; }
-        public float QuadSize { get; set; }
-        public int VerticesCount { get; set; }
-        public Texture2D DefaultTexture { get; set; }
-        public Shader DefaultShader { get; set; }
-        public TerrainMorphTransform Transform { get; set; }
-        public TerrainMorphCellMeshData Mesh { get; set; }
+        public string Name;
+        public float QuadSize;
+        public int VerticesCount;
+        public Texture2D DefaultTexture;
+        public Shader DefaultShader;
+        public TerrainMorphTransform Transform;
+        public TerrainMorphCellMeshData Mesh;
 
         public static TerrainMorphCellData Map(TerrainMorphCell item)
         {
@@ -69,7 +59,7 @@ namespace TerrainMorphSpace
             };
         }
 
-        public static TerrainMorphCell Map(TerrainMorphCellData item)
+        public static TerrainMorphCell Map(TerrainMorphCellData item, string terrainName)
         {
             var cellObj = new GameObject(item.Name, typeof(TerrainMorphCell));
             var cellComponent = cellObj.GetComponent<TerrainMorphCell>();
@@ -83,19 +73,24 @@ namespace TerrainMorphSpace
             cellComponent.transform.position = item.Transform.Position;
             cellComponent.transform.rotation = item.Transform.Rotation;
             cellComponent.transform.localScale = item.Transform.Scale;
+            cellComponent.MeshRenderer.materials = new Material[1];
+            cellComponent.MeshRenderer.materials[0] = new Material(item.DefaultShader);
+            cellComponent.MeshRenderer.materials[0].SetTexture(cellComponent.TextureNameInShader, 
+                TerrainMorphService.GetTexture(terrainName, item.Name));
 
             return cellComponent;
         }
     }
 
+    [Serializable]
     public class TerrainMorphCellMeshData
     {
-        public string Name { get; set; }
-        public Vector3[] Vertices { get; set; }
-        public Vector3[] Normals { get; set; }
-        public Vector2[] Uvs { get; set; }
-        public Color[] Colors { get; set; }
-        public int[] Triangles { get; set; }
+        public string Name;
+        public Vector3[] Vertices;
+        public Vector3[] Normals;
+        public Vector2[] Uvs;
+        public Color[] Colors;
+        public int[] Triangles;
 
         public static TerrainMorphCellMeshData Map(Mesh item)
         {
@@ -124,11 +119,12 @@ namespace TerrainMorphSpace
         }
     }
 
+    [Serializable]
     public class TerrainMorphTransform
     {
-        public Vector3 Position { get; set; }
-        public Quaternion Rotation { get; set; }
-        public Vector3 Scale { get; set; }
+        public Vector3 Position;
+        public Quaternion Rotation;
+        public Vector3 Scale;
 
         public static TerrainMorphTransform Map(Transform item)
         {

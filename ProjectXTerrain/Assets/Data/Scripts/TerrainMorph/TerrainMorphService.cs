@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace TerrainMorphSpace
 {
     public static class TerrainMorphService
     {
+        public static readonly string DefaultPath = "/Data/Resources/Terrains/";
+
         /// <summary>
         /// Create a new cell
         /// </summary>
@@ -126,6 +130,67 @@ namespace TerrainMorphSpace
                 }
 
                 Gizmos.color = defaultColor;
+            }
+        }
+
+        public static void SaveTerrain(TerrainMorphData terrain)
+        {
+            CreateDirectoryIfNotExist(DefaultPath + terrain.Name);
+            var text = JsonUtility.ToJson(terrain);
+            using (var fs = new StreamWriter(File.Open
+                (Application.dataPath + DefaultPath + terrain.Name + "/" + terrain.Name + ".json", FileMode.OpenOrCreate)))
+            {
+                fs.Write(text);
+            }
+        }
+
+        public static TerrainMorphData LoadTerrain(string terrainName)
+        {
+            CreateDirectoryIfNotExist(DefaultPath + terrainName);
+            using (var fs = new StreamReader(File.Open
+                (Application.dataPath + DefaultPath + terrainName + "/" + terrainName + ".json", FileMode.Open)))
+            {
+                var text = fs.ReadToEnd();
+                var result = JsonUtility.FromJson<TerrainMorphData>(text);
+                return result;
+            }
+        }
+
+        public static TerrainMorphData LoadTerrainFromPath(string terrainPath)
+        {
+            CreateDirectoryIfNotExist(terrainPath);
+            using (var fs = new StreamReader(File.Open
+                (Application.dataPath + terrainPath, FileMode.Open)))
+            {
+                var text = fs.ReadToEnd();
+                var result = JsonUtility.FromJson<TerrainMorphData>(text);
+                return result;
+            }
+        }
+
+        public static Texture2D CreateTexture(string terrainName, string cellName, Texture2D copy)
+        {
+            CreateDirectoryIfNotExist(DefaultPath + terrainName);
+            AssetDatabase.CreateAsset(copy, "Assets" + DefaultPath + terrainName + "/" + cellName + "Texture.png");
+            return copy;
+        }
+
+        public static Texture2D GetTexture(string terrainName, string cellName)
+        {
+            CreateDirectoryIfNotExist(DefaultPath + terrainName);
+            return AssetDatabase.LoadAssetAtPath<Texture2D>("Assets" + DefaultPath + terrainName + "/" + cellName + "Texture.png");
+        }
+
+        public static bool IsSaved(string terrainName)
+        {
+            return File.Exists(Application.dataPath + DefaultPath + terrainName + ".json");
+        }
+
+        private static void CreateDirectoryIfNotExist(string directory)
+        {
+            if (!Directory.Exists(Application.dataPath + directory))
+            {
+                Directory.CreateDirectory(Application.dataPath + directory);
             }
         }
 

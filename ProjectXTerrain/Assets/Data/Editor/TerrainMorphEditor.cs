@@ -24,5 +24,12 @@ public class TerrainMorphEditor : Editor
                 terrain.Initialize();
             }
         }
+        else
+        {
+            if (GUILayout.Button("Save"))
+            {
+                terrain.SaveData();
+            }
+        }
     }
 }

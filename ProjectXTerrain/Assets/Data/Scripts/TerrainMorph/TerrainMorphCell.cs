@@ -20,6 +20,8 @@ public class TerrainMorphCell : MonoBehaviour
 
     public Texture2D DefaultTexture;
     public Shader DefaultShader;
+    [HideInInspector]
+    public string TextureNameInShader = "_MainTex";
 
     public Mesh Mesh
     {
@@ -30,7 +32,7 @@ public class TerrainMorphCell : MonoBehaviour
                 meshFilter = GetComponent<MeshFilter>();
             }
 
-            return meshFilter.mesh;
+            return meshFilter.sharedMesh;
         }
         set
         {
@@ -39,7 +41,20 @@ public class TerrainMorphCell : MonoBehaviour
                 meshFilter = GetComponent<MeshFilter>();
             }
 
-            meshFilter.mesh = value;
+            meshFilter.sharedMesh = value;
+        }
+    }
+
+    public MeshRenderer MeshRenderer
+    {
+        get
+        {
+            if (!meshRenderer)
+            {
+                meshRenderer = GetComponent<MeshRenderer>();
+            }
+
+            return meshRenderer;
         }
     }
 
@@ -52,7 +67,7 @@ public class TerrainMorphCell : MonoBehaviour
         InitializeComponents();
     }
 
-    public void Initialize(int id, Vector3 position, 
+    public void Initialize(int id, string terrainName, Vector3 position, 
         float quadSize, int verticesCount, 
         Texture2D defaultTexture, Shader defaultShader)
     {
@@ -70,6 +85,9 @@ public class TerrainMorphCell : MonoBehaviour
             VerticesCount, 
             QuadSize);
 
+        Name = Name + correctId;
+        name = Name;
+
         meshRenderer.materials = new Material[1];
 
         if (DefaultShader != null)
@@ -77,13 +95,12 @@ public class TerrainMorphCell : MonoBehaviour
             meshRenderer.materials[0] = new Material(DefaultShader);
             if (DefaultTexture != null)
             {
-                meshRenderer.materials[0].SetTexture("_MainTex", DefaultTexture);
+                meshRenderer.materials[0].SetTexture(TextureNameInShader, 
+                    TerrainMorphService.CreateTexture(terrainName, Name, Instantiate(DefaultTexture)));
             }
         }
 
         thisTransform.position = position;
-        Name = Name + correctId;
-        name = Name;
     }
 
     private void InitializeComponents()

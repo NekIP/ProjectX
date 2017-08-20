@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using TerrainMorphSpace;
 using UnityEngine;
 
 public class TerrainMorph : MonoBehaviour
 {
     [Header("Terrain settings")]
+    public string Name;
+
     [Range(1, 1000)]
     [Tooltip("The initial  number of cells on one side")]
     public int CellCountInOneSideDefault = 3;
@@ -39,6 +43,7 @@ public class TerrainMorph : MonoBehaviour
 
         if (TryDownloadData())
         {
+            WasInitialized = true;
             return;
         }
 
@@ -51,6 +56,7 @@ public class TerrainMorph : MonoBehaviour
                 var cellComponent = cellObj.GetComponent<TerrainMorphCell>();
                 cellComponent.Initialize(
                     Cells.Count,
+                    Name,
                     thisTransform.position + new Vector3(i * cellSize, 0, j * cellSize),
                     QuadSize,
                     VerticesCount,
@@ -68,16 +74,30 @@ public class TerrainMorph : MonoBehaviour
 
     public bool TryDownloadData()
     {
+        if (TerrainMorphService.IsSaved(Name))
+        {
+            var data = TerrainMorphService.LoadTerrain(Name);
+            CellCountInOneSideDefault = data.CellCountInOneSideDefault;
+            Cells = data.Cells.Select(x => TerrainMorphCellData.Map(x, Name)).ToList();
+            QuadSize = data.QuadSize;
+            VerticesCount = data.VerticesCount;
+            DefaultTexture = data.DefaultTexture;
+            DefaultShader = data.DefaultShader;
+            Cells.ForEach(cell => cell.transform.parent = thisTransform);
+            return true;
+        }
+
         return false;
     }
 
     public void SaveData()
     {
-
+        TerrainMorphService.SaveTerrain(TerrainMorphData.Map(this));
     }
 
     private void InitializeComponents()
     {
+        Name = name;
         if (!thisTransform)
         {
             thisTransform = GetComponent<Transform>();
