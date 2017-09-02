@@ -105,6 +105,7 @@ public class TerrainMorphCell : MonoBehaviour
             }
         }
 
+        gameObject.layer = 31;
         collider.sharedMesh = meshFilter.sharedMesh;
 
         thisTransform.position = position;

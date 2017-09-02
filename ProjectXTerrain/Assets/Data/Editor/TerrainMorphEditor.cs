@@ -35,6 +35,10 @@ public class TerrainMorphEditor : Editor
             {
                 terrain.Delete();
             }
+            if (GUILayout.Button("Remove(with saved)"))
+            {
+                terrain.Delete(true);
+            }
         }
     }
 }

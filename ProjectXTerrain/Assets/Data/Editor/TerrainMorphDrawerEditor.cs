@@ -11,8 +11,11 @@ namespace Assets.Data.Editor
         public static void DrawCircleOnMouse(float radius)
         {
             var ray = Camera.current.ScreenPointToRay(Input.mousePosition);
-
-            // Gizmos.DrawWireSphere();
+            RaycastHit hit;
+            if (!Physics.Raycast(ray, out hit))
+            {
+                return;
+            }
         }
     }
 }
