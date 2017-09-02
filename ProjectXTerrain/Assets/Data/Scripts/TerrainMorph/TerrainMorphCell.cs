@@ -6,16 +6,19 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class TerrainMorphCell : MonoBehaviour
 {
+    [HideInInspector]
     public string Name = "TerrainMorphCell";
 
     [Header("DON'T TOUCH!!! Only get")]
     [Range(0.01f, 1f)]
     [Tooltip("The number of vertices along the length and width of the cell")]
+    [HideInInspector]
     public float QuadSize = 0.25f;
 
     [Range(2, 500)]
     [Tooltip("The size of the sides of the square formed by the vertices" +
         "(or the distance between adjacent vertices without diagonal)")]
+    [HideInInspector]
     public int VerticesCount = 80;
 
     public Texture2D DefaultTexture;
