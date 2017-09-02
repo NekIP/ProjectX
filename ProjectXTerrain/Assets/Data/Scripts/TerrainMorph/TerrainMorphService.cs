@@ -183,19 +183,19 @@ namespace TerrainMorphSpace
         public static Texture2D CreateTexture(string terrainName, string cellName, Texture2D copy)
         {
             CreateDirectoryIfNotExist(DefaultPath + terrainName);
-            AssetDatabase.CreateAsset(copy, "Assets" + DefaultPath + terrainName + "/" + cellName + "Texture.png");
+            AssetDatabase.CreateAsset(copy, "Assets" + DefaultPath + terrainName + "/" + cellName + "Texture.asset");
             return copy;
         }
 
         public static Texture2D GetTexture(string terrainName, string cellName)
         {
             CreateDirectoryIfNotExist(DefaultPath + terrainName);
-            return AssetDatabase.LoadAssetAtPath<Texture2D>("Assets" + DefaultPath + terrainName + "/" + cellName + "Texture.png");
+            return AssetDatabase.LoadAssetAtPath<Texture2D>("Assets" + DefaultPath + terrainName + "/" + cellName + "Texture.asset");
         }
 
         public static bool IsSaved(string terrainName)
         {
-            return File.Exists(Application.dataPath + DefaultPath + terrainName + ".json");
+            return File.Exists(Application.dataPath + DefaultPath + terrainName + "/" + terrainName + ".json");
         }
 
         private static void CreateDirectoryIfNotExist(string directory)
