@@ -8,10 +8,19 @@ using UnityEngine;
 public class TerrainMorphEditor : Editor
 {
     TerrainMorph terrain;
+    Ray ray;
 
     void OnEnable()
     {
         terrain = (TerrainMorph)target;
+    }
+
+    private void OnSceneGUI()
+    {
+        if (terrain.WasInitialized)
+        {
+            TerrainMorphDrawerEditor.DrawCircleOnMouse(5);
+        }
     }
 
     public override void OnInspectorGUI()

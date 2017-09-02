@@ -2,20 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Data.Editor
+public static class TerrainMorphDrawerEditor
 {
-    public static class TerrainMorphDrawerEditor
+    public static void DrawCircleOnMouse(float radius, int terrainLayer = 31)
     {
-        public static void DrawCircleOnMouse(float radius)
+        var mousePosition = Event.current.mousePosition;
+        var ray = HandleUtility.GUIPointToWorldRay(mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
         {
-            var ray = Camera.current.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (!Physics.Raycast(ray, out hit))
-            {
-                return;
-            }
+            // Gizmos.DrawSphere(hit.point, radius);
+            SceneView.currentDrawingSceneView.OnSelectionChange();
+            Debug.DrawLine(hit.point, new Vector3(hit.point.x, 1, hit.point.z));
         }
     }
 }
+
