@@ -3,6 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(Collider))]
 [ExecuteInEditMode]
 public class TerrainMorphCell : MonoBehaviour
 {
