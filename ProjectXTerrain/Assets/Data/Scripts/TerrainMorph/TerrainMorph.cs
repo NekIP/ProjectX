@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TerrainMorphSpace;
+using UnityEditor;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class TerrainMorph : MonoBehaviour
 {
     [Header("Terrain settings")]
@@ -37,7 +39,16 @@ public class TerrainMorph : MonoBehaviour
     {
         InitializeComponents();
     }
-	
+
+
+    public void OnDrawGizmosSelected()
+    {
+        if (WasInitialized)
+        {
+            TerrainMorphDrawerEditor.DrawCircleOnMouse(1);
+        }
+    }
+
     public void Initialize()
     {
         InitializeComponents();

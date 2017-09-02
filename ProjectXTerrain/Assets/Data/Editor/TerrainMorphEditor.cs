@@ -19,7 +19,13 @@ public class TerrainMorphEditor : Editor
     {
         if (terrain.WasInitialized)
         {
-            TerrainMorphDrawerEditor.DrawCircleOnMouse(5);
+            var controlId = GUIUtility.GetControlID(FocusType.Passive);
+            var eventType = Event.current.GetTypeForControl(controlId);
+            if (eventType == EventType.MouseDown && Event.current.button == 0)
+            {
+                GUIUtility.hotControl = controlId;
+                return;
+            }
         }
     }
 

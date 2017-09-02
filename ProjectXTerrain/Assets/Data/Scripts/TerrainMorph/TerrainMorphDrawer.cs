@@ -14,9 +14,8 @@ public static class TerrainMorphDrawerEditor
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
-            // Gizmos.DrawSphere(hit.point, radius);
-            SceneView.currentDrawingSceneView.OnSelectionChange();
-            Debug.DrawLine(hit.point, new Vector3(hit.point.x, 1, hit.point.z));
+            Gizmos.DrawWireSphere(hit.point, radius);
+            SceneView.RepaintAll();
         }
     }
 }
