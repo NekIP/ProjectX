@@ -16,6 +16,7 @@ public class TerrainMorphEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        GUILayout.Label("Name: " + terrain.Name);
         DrawDefaultInspector();
         if (!terrain.WasInitialized)
         {
@@ -29,6 +30,10 @@ public class TerrainMorphEditor : Editor
             if (GUILayout.Button("Save"))
             {
                 terrain.SaveData();
+            }
+            if (GUILayout.Button("Remove"))
+            {
+                terrain.Delete();
             }
         }
     }

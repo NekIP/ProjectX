@@ -6,6 +6,7 @@ using UnityEngine;
 public class TerrainMorph : MonoBehaviour
 {
     [Header("Terrain settings")]
+    [HideInInspector]
     public string Name;
 
     [Range(1, 1000)]
@@ -93,6 +94,14 @@ public class TerrainMorph : MonoBehaviour
     public void SaveData()
     {
         TerrainMorphService.SaveTerrain(TerrainMorphData.Map(this));
+    }
+
+    public void Delete()
+    {
+        WasInitialized = false;
+        Cells.ForEach(x => DestroyImmediate(x.gameObject));
+        Cells = new List<TerrainMorphCell>();
+        TerrainMorphService.DeleteTerrain(Name);
     }
 
     private void InitializeComponents()

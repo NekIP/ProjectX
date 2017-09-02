@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -141,6 +142,17 @@ namespace TerrainMorphSpace
                 (Application.dataPath + DefaultPath + terrain.Name + "/" + terrain.Name + ".json", FileMode.OpenOrCreate)))
             {
                 fs.Write(text);
+            }
+        }
+
+        public static void DeleteTerrain(string terrainName)
+        {
+            var path = Application.dataPath + DefaultPath + terrainName;
+            if (Directory.Exists(path))
+            {
+                var files = Directory.GetFiles(path).ToList();
+                files.ForEach(x => File.Delete(x));
+                Directory.Delete(path);
             }
         }
 
