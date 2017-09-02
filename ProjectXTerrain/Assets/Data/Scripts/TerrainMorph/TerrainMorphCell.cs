@@ -3,7 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(MeshCollider))]
 [ExecuteInEditMode]
 public class TerrainMorphCell : MonoBehaviour
 {
@@ -65,6 +65,7 @@ public class TerrainMorphCell : MonoBehaviour
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
     private Transform thisTransform;
+    private MeshCollider collider;
 
     public void Start ()
     {
@@ -104,6 +105,8 @@ public class TerrainMorphCell : MonoBehaviour
             }
         }
 
+        collider.sharedMesh = meshFilter.sharedMesh;
+
         thisTransform.position = position;
     }
 
@@ -122,6 +125,11 @@ public class TerrainMorphCell : MonoBehaviour
         if (!thisTransform)
         {
             thisTransform = GetComponent<Transform>();
+        }
+
+        if (!collider)
+        {
+            collider = GetComponent<MeshCollider>();
         }
     }
 
