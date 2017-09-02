@@ -96,12 +96,15 @@ public class TerrainMorph : MonoBehaviour
         TerrainMorphService.SaveTerrain(TerrainMorphData.Map(this));
     }
 
-    public void Delete()
+    public void Delete(bool deleteSaved = false)
     {
         WasInitialized = false;
         Cells.ForEach(x => DestroyImmediate(x.gameObject));
         Cells = new List<TerrainMorphCell>();
-        TerrainMorphService.DeleteTerrain(Name);
+        if (deleteSaved)
+        {
+            TerrainMorphService.DeleteTerrain(Name);
+        }
     }
 
     private void InitializeComponents()
